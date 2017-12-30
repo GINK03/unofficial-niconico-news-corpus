@@ -14,8 +14,11 @@ m = MeCab.Tagger("-Owakati")
 
 def _map(name):
   print(name)
-  db = dbm.open(name, 'c')
   url_vals =  {}
+  try:
+    db = dbm.open(name, 'c')
+  except Exception as ex:
+    return url_vals
   for url in db.keys():
     html = db[url].decode()
     soup = bs4.BeautifulSoup(html)
