@@ -8,6 +8,8 @@ import os
 
 import pickle
 
+import gzip
+
 import glob
 #os.system('cp -r ./dbms /tmp/dbms')
 #m = MeCab.Tagger("-Owakati")
@@ -18,13 +20,13 @@ def _map(name):
   try:
     db = dbm.open(name, 'c')
   except Exception as ex:
-    return url_vals
+    return gzip.compress(pickle.dumps(url_vals))
   for url in db.keys():
     html = db[url].decode()
     soup = bs4.BeautifulSoup(html)
     if soup.find('div', {'class':'error_code'}) is not None:
       continue
-    title = soup.find("h1") 
+    title = soup.find("div", {'class':'article-text-wrap'}) 
     if title is None: 
       print( url)
       continue
@@ -40,14 +42,15 @@ def _map(name):
     bodies = body.text.strip()
     
     url_vals[url] = pickle.dumps( {"time":time, "titles":titles, "bodies":bodies } )
-  return url_vals
+
+  return gzip.compress(pickle.dumps(url_vals))
 
 db_14 = dbm.open('14-text.dbm', 'c')
 
 names = [name for name in glob.glob('dbms/*')]
 
 import concurrent.futures
-with concurrent.futures.ProcessPoolExecutor(max_workers=16) as exe:
+with concurrent.futures.ProcessPoolExecutor(max_workers=20) as exe:
   for url_vals in exe.map(_map, names):
-    for url, val in url_vals.items():
+    for url, val in pickle.loads(gzip.decompress(url_vals)).items():
       db_14[url] = val
