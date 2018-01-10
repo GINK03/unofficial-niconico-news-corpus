@@ -35,5 +35,5 @@ for index, i in enumerate(sorted(range(0, 3195155), key=lambda x:x*-1)):
 arrs = [ (index, iss) for index, iss in arrs.items() ] 
 print("start to scan")
 #_map(arrs[-1])
-with concurrent.futures.ProcessPoolExecutor(max_workers=32) as ex:
+with concurrent.futures.ProcessPoolExecutor(max_workers=64) as ex:
   ex.map(_map, arrs) 
