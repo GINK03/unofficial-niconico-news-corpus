@@ -9,6 +9,10 @@ import os
 import pickle
 
 import glob
+
+import json
+
+import hashlib
 #os.system('cp -r ./dbms /tmp/dbms')
 m = MeCab.Tagger("-Owakati")
 
@@ -22,7 +26,9 @@ def _map(name):
     return url_vals
   for url in db.keys():
     try:
-      #print(url)
+      if os.path.exists('parsed/' + hashlib.sha256(url).hexdigest()):
+        print('already passed', url)
+        continue
       html = db[url].decode()
       soup = bs4.BeautifulSoup(html)
       if soup.find('div', {'class':'error_code'}) is not None:
@@ -42,7 +48,8 @@ def _map(name):
       titles = m.parse(title.text).strip()
       bodies = m.parse(body.text).strip()
       
-      url_vals[url] = pickle.dumps( {"time":time, "titles":titles, "bodies":bodies } )
+      print(url)
+      open('parsed/' + hashlib.sha256(url).hexdigest(),'w').write( json.dumps( {"time":time, "titles":titles, "bodies":bodies } ) )
     except Exception as ex:
       print(ex)
       ...
