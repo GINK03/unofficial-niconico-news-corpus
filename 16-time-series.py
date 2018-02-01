@@ -3,7 +3,7 @@ import dbm
 import pickle
 
 import datetime
-db = dbm.open('14-wakati.dbm', 'r')
+db = dbm.open('dataset/14-text.dbm', 'r')
 
 key_values = {}
 for key in db.keys():
