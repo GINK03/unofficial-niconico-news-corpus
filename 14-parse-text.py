@@ -13,27 +13,25 @@ import glob
 import json
 
 import hashlib
-#os.system('cp -r ./dbms /tmp/dbms')
-m = MeCab.Tagger("-Owakati")
 
-def _map(name):
-  print(name)
-  url_vals =  {}
-  try:
-    db = dbm.open(name, 'c')
-  except Exception as ex:
-    print(ex)
-    return url_vals
-  for url in db.keys():
+m = MeCab.Tagger("-Owakati")
+base_url = 'http://news.nicovideo.jp/watch/nw{}'
+
+def _map(arr):
+  index, iss = arr
+  for i in iss:
+    url = base_url.format(i)
     try:
-      if os.path.exists('parsed/' + hashlib.sha256(url).hexdigest()):
+      if os.path.exists('parsed/' + hashlib.sha256(bytes(url,'utf8')).hexdigest()):
         print('already passed', url)
         continue
-      html = db[url].decode()
-      soup = bs4.BeautifulSoup(html)
+      with open('htmls/' +  hashlib.sha256(bytes(url,'utf8')).hexdigest()) as fp:
+        soup = bs4.BeautifulSoup(fp.read())
       if soup.find('div', {'class':'error_code'}) is not None:
         continue
-      title = soup.find("h1") 
+      title = soup.title
+      #print(title)
+
       if title is None: 
         print( url)
         continue
@@ -49,19 +47,20 @@ def _map(name):
       bodies = m.parse(body.text).strip()
       
       print(url)
-      open('parsed/' + hashlib.sha256(url).hexdigest(),'w').write( json.dumps( {"time":time, "titles":titles, "bodies":bodies } ) )
+      open('parsed/' + hashlib.sha256(bytes(url,'utf8')).hexdigest(),'w').write( json.dumps( {"time":time, "titles":titles, "bodies":bodies } , ensure_ascii=False, indent=2 ) )
     except Exception as ex:
       print(ex)
-      ...
-  return url_vals
 
-db_14 = dbm.open('14-wakati.dbm', 'c')
 
-names = [name for name in glob.glob('dbms/*')]
+arrs = {}
+for index, i in enumerate(sorted(range(0, 3711531), key=lambda x:x*-1)):
+  key = index%32
+  if arrs.get(key) is None:
+    arrs[key] = []
+  arrs[key].append( i )
+arrs = [ (index, iss) for index, iss in arrs.items() ] 
 
-#_map( names[0] )
+_map( arrs[0] )
+print("start to scan")
 import concurrent.futures
-with concurrent.futures.ProcessPoolExecutor(max_workers=16) as exe:
-  for url_vals in exe.map(_map, names):
-    for url, val in url_vals.items():
-      db_14[url] = val
+concurrent.futures.ProcessPoolExecutor(max_workers=16).map(_map, arrs)
