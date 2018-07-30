@@ -6,7 +6,6 @@ import math
 import glob
 import json
 
-:
 docs      = glob.glob('parsed/*')
 term_freq = {}
 
@@ -21,7 +20,7 @@ for doc in docs:
   for term in terms:
     if term_freq.get(term) is None:
       term_freq[term] = 0
-    term_freq[term] += 1
+    term_freq[term]  += 1
 
 term_idf = {}
 for term in list(term_freq.keys()):
