@@ -26,7 +26,7 @@ def _map(arr):
       print(ex)
 
 arrs = {}
-for index, i in enumerate(sorted(range(0, 4170719), key=lambda x:x*-1)):
+for index, i in enumerate(sorted(range(3_500_000, 4_170_719), key=lambda x:x*-1)):
   key = index%32
   if arrs.get(key) is None:
     arrs[key] = []
