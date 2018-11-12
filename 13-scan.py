@@ -1,18 +1,12 @@
 import requests
-
 import dbm
-
 import time
-
 import concurrent.futures
-
 import random
-
 from pathlib import Path
-
 from hashlib import sha256
-base_url = 'http://news.nicovideo.jp/watch/nw{}'
 
+base_url = 'http://news.nicovideo.jp/watch/nw{}'
 headers = {'User-agent':"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.84 Safari/537.36"}
 
 def _map(arr):
@@ -32,7 +26,7 @@ def _map(arr):
       print(ex)
 
 arrs = {}
-for index, i in enumerate(sorted(range(0, 3711531), key=lambda x:x*-1)):
+for index, i in enumerate(sorted(range(0, 4170719), key=lambda x:x*-1)):
   key = index%32
   if arrs.get(key) is None:
     arrs[key] = []
