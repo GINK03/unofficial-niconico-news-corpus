@@ -1,34 +1,19 @@
-import json
-from pathlib import Path
-import MeCab
+import glob
 import pandas as pd
-from concurrent.futures import ProcessPoolExecutor as PPE
+import json
 
-def pmap(arg):
-  m = MeCab.Tagger('-Owakati')
-  key, paths = arg
-  #if index > 50000: 
-  #  break
-  objs = []
-  for path in paths:
-    obj = json.load(path.open())
-    bodies = obj['bodies']
-    title  = obj['titles']
-    times  = obj['time']
-    obj['bodies'] = m.parse(bodies).strip()
-    obj['title']  = m.parse(title).strip()
-    objs.append(obj)
+df = pd.concat([pd.read_csv(fn, compression='gzip', engine='python') for fn in glob.glob('*.csv.gz')], axis=0)
 
-  df = pd.DataFrame(objs)
-  df.to_csv(f'parsed_{key:04d}.csv.gz', index=None, compression='gzip')
+print(len(df.columns))
 
-key_paths = {}
-for index, path in enumerate(Path('./parsed').glob('*')):
-  key = index%12
-  if key_paths.get(key) is None:
-    key_paths[key] = []
-  key_paths[key].append( path )
-key_paths = [(key,paths) for key,paths in key_paths.items()]
+term_index = {}
+for title, body in zip(df['titles'], df['bodies']):
+  try:
+    for term in set(title.split()) | set(body.split()):
+      if term_index.get(term) is None:
+        term_index[term] = len(term_index)
+  except Exception as ex:
+    print(ex)
 
-with PPE(max_workers=12) as exe:
-  exe.map(pmap, key_paths)
+ser = json.dumps(term_index, indent=2, ensure_ascii=False)
+open('index_term.json', 'w').write(ser)
