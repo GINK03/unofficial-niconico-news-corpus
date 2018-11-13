@@ -15,7 +15,6 @@ def _map(arg):
     hashed = name.split('/')[-1]
     if Path(f'parsed/{hashed}').exists():
       continue
-    print(name)
     soup = bs4.BeautifulSoup( gzip.decompress(open(name, 'rb').read()) )
     if soup.find('div', {'class':'error_code'}) is not None:
       Path(name).unlink()
@@ -42,7 +41,8 @@ def _map(arg):
       continue
     obj = {"time":time, 'ccount':ccount, "titles":titles, "bodies":bodies }
     json.dump(obj, fp=open(f'parsed/{hashed}', 'w'), ensure_ascii=False, indent=2)
-    print(obj)
+    print(name)
+    #print(obj)
 
 
 key_names = {}

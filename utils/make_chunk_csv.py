@@ -20,15 +20,15 @@ def pmap(arg):
     objs.append(obj)
 
   df = pd.DataFrame(objs)
-  df.to_csv(f'parsed_{key:04d}.csv.gz', index=None, compression='gzip')
+  df.to_csv(f'outputs/parsed_{key:04d}.csv.gz', index=None, compression='gzip')
 
 key_paths = {}
 for index, path in enumerate(Path('./parsed').glob('*')):
-  key = index%12
+  key = index%16
   if key_paths.get(key) is None:
     key_paths[key] = []
   key_paths[key].append( path )
 key_paths = [(key,paths) for key,paths in key_paths.items()]
 
-with PPE(max_workers=12) as exe:
+with PPE(max_workers=16) as exe:
   exe.map(pmap, key_paths)
