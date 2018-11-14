@@ -2,7 +2,7 @@ import glob
 import pandas as pd
 import json
 
-df = pd.concat([pd.read_csv(fn, compression='gzip', engine='python') for fn in glob.glob('*.csv.gz')], axis=0)
+df = pd.concat([pd.read_csv(fn, compression='gzip', engine='python') for fn in glob.glob('outputs/*.csv.gz')], axis=0)
 
 print(len(df.columns))
 
