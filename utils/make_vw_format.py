@@ -18,7 +18,7 @@ def pmap(arg):
   fp = gzip.open(f'outputs/train_{key:04d}.vw.gz', 'wt')
   for ccount, title, body in zip(df['ccount'], df['titles'], df['bodies']):
     print(ccount, key)
-    flag = 1 if ccount > 5 else 0
+    flag = 1 if ccount > 5 else -1
     obj = dict(Counter(body.split())) 
 
     vals = [f'{term_index[term]}:{freq:0.4f}' for term, freq in obj.items() if term_index.get(term) is not None]

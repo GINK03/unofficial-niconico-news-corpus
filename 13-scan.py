@@ -9,7 +9,7 @@ import gzip
 base_url = 'http://news.nicovideo.jp/watch/nw{}'
 headers = {'User-agent':"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.84 Safari/537.36"}
 
-def _map(arr):
+def pmap(arr):
   index, iss = arr
   for i in random.sample(iss, len(iss)):
     try:
@@ -26,7 +26,7 @@ def _map(arr):
       print(ex)
 
 arrs = {}
-for index, i in enumerate(sorted(range(1_500_000, 4_170_719), key=lambda x:x*-1)):
+for index, i in enumerate(sorted(range(1_000_000, 4_170_719), key=lambda x:x*-1)):
   key = index%32
   if arrs.get(key) is None:
     arrs[key] = []
@@ -35,4 +35,4 @@ arrs = [ (index, iss) for index, iss in arrs.items() ]
 print("start to scan")
 #_map(arrs[-1])
 with concurrent.futures.ProcessPoolExecutor(max_workers=32) as ex:
-  ex.map(_map, arrs) 
+  ex.map(pmap, arrs) 
